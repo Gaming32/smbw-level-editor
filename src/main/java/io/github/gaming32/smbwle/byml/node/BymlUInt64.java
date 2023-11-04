@@ -5,7 +5,7 @@ import io.github.gaming32.smbwle.byml.BymlTypes;
 import java.math.BigInteger;
 
 public final class BymlUInt64 extends BymlNumber {
-    private static final BigInteger ULONG_MAX = BigInteger.ONE.shiftLeft(64).subtract(BigInteger.ONE);
+    public static final BigInteger ULONG_MAX = BigInteger.ONE.shiftLeft(64).subtract(BigInteger.ONE);
 
     public static final BymlUInt64 ZERO = new BymlUInt64(0L);
 

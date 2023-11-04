@@ -117,13 +117,13 @@ public final class BymlWriter {
         if (hashKeyTableOffsetWriter != null) {
             hashKeyTableOffsetWriter.writeCurrentOffset(0);
             writeStringTable(output, hashKeyTable);
-            output.position(BymlReader.align((int)output.position()));
+            align(output);
         }
 
         if (stringTableOffsetWriter != null) {
             stringTableOffsetWriter.writeCurrentOffset(0);
             writeStringTable(output, stringTable);
-            output.position(BymlReader.align((int)output.position()));
+            align(output);
         }
 
         final Object2IntMap<BymlNode> nodeToOffset = new Object2IntOpenCustomHashMap<>(new Hash.Strategy<>() {
@@ -141,7 +141,7 @@ public final class BymlWriter {
 
         rootOffsetWriter.writeCurrentOffset(0);
         writeNonValueNode(output, root, nodeToOffset);
-        output.position(BymlReader.align((int)output.position()));
+        align(output);
     }
 
     private int hashCode(BymlNode node) {
@@ -180,7 +180,7 @@ public final class BymlWriter {
                     buffer.put((byte)item.getType());
                 }
                 write(output, buffer);
-                output.position(BymlReader.align((int)output.position()));
+                align(output);
                 for (final BymlNode item : array) {
                     if (isValueType(item.getType())) {
                         writeValueNode(output, item);
@@ -269,6 +269,17 @@ public final class BymlWriter {
             return this.buffer = ByteBuffer.allocate(cap).order(buffer.order());
         }
         return buffer;
+    }
+
+    private void align(SeekableByteChannel output) throws IOException {
+        // Some channels don't support seeking past the end properly (looking at you, ZipFileSystem), so we can just
+        // write zeros from the current buffer
+        final int startPos = (int)output.position();
+        final int endPos = BymlReader.align(startPos);
+        if (endPos > startPos) {
+            // Put an int 0 to zero out the important part of the buffer
+            write(output, buffer.putInt(0).position(endPos - startPos));
+        }
     }
 
     private static ByteBuffer write24BitSkip8(ByteBuffer buffer, int eight, int twentyFour) {
