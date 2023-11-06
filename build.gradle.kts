@@ -15,6 +15,7 @@ dependencies {
     implementation("org.jetbrains:annotations:24.0.0")
     implementation("org.apache.commons:commons-compress:1.24.0")
     implementation("it.unimi.dsi:fastutil-core:8.5.12")
+    implementation("com.formdev:flatlaf:3.2.5")
 }
 
 java {
